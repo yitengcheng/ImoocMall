@@ -7,8 +7,12 @@ import './assets/css/base.css';
 import './assets/css/checkout.css';
 import './assets/css/login.css';
 import './assets/css/product.css';
+import VueLazyLoad from 'vue-lazyload';
 
 Vue.config.productionTip = false;
+Vue.use(VueLazyLoad, {
+    loading: '/static/loading-svg/loading-balls.svg'
+});
 
 /* eslint-disable no-new */
 new Vue({
