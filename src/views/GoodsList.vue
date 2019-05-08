@@ -10,7 +10,7 @@
         <div class="filter-nav">
           <span class="sortby">Sort by:</span>
           <a href="javascript:void(0)" class="default cur">Default</a>
-          <a href="javascript:void(0)" class="price">
+          <a @click="sortGoods" href="javascript:void(0)" class="price">
             Price
             <svg class="icon icon-arrow-short">
               <use xlink:href="#icon-arrow-short"></use>
@@ -43,21 +43,27 @@
           <div class="accessory-list-wrap">
             <div class="accessory-list col-4">
               <ul>
-                <li v-for="(item,index) in goodsList.result" :key="index">
+                <li v-for="(item,index) in goodsList" :key="index">
                   <div class="pic">
                     <a href="#">
-                      <img v-lazy="'static/'+item.productImg" alt>
+                      <img v-lazy="'static/'+item.productImage" :key="item.productImage" alt>
                     </a>
                   </div>
                   <div class="main">
                     <div class="name">{{item.productName}}</div>
-                    <div class="price">{{item.productPrice}}</div>
+                    <div class="price">{{item.salePrice}}</div>
                     <div class="btn-area">
                       <a href="javascript:;" class="btn btn--m">加入购物车</a>
                     </div>
                   </div>
                 </li>
               </ul>
+              <div
+                class="load-more"
+                v-infinite-scroll="loadMore"
+                infinite-scroll-disabled="busy"
+                infinite-scroll-distance="10"
+              >加载中...</div>
             </div>
           </div>
         </div>
@@ -93,13 +99,36 @@ export default {
             ],
             priceChecked: 'all',
             filterBy: false,
-            overLayFlag: false
+            overLayFlag: false,
+            sortFalg: true,
+            page: 1,
+            busy: true
         };
     },
     methods: {
-        getGoodsList () {
-            axios.get('/goods/list').then(result => {
-                this.goodsList = result.data;
+        getGoodsList (pushFalg) {
+            let params = {
+                page: this.page,
+                sort: this.sortFalg ? 1 : -1
+            };
+            axios.get('/goods', { params }).then(result => {
+                let { data } = result;
+                let { list, success, msg, count } = data;
+                if (success) {
+                    if (pushFalg) {
+                        this.goodsList = this.goodsList.concat(list);
+                        if (count === 0) {
+                            this.busy = true;
+                        } else {
+                            this.busy = false;
+                        }
+                    } else {
+                        this.goodsList = list;
+                        this.busy = false;
+                    }
+                } else {
+                    console.log(`error: ${msg}`);
+                }
             });
         },
         setPriceFilter (index) {
@@ -113,6 +142,18 @@ export default {
         closePop () {
             this.filterBy = false;
             this.overLayFlag = false;
+        },
+        sortGoods () {
+            this.sortFalg = !this.sortFalg;
+            this.page = 1;
+            this.getGoodsList();
+        },
+        loadMore () {
+            this.busy = true;
+            setTimeout(() => {
+                this.page++;
+                this.getGoodsList(true);
+            }, 1000);
         }
     },
     mounted () {
@@ -121,4 +162,9 @@ export default {
 };
 </script>
 <style scoped>
+.load-more {
+  height: 100px;
+  line-height: 100px;
+  text-align: center;
+}
 </style>
