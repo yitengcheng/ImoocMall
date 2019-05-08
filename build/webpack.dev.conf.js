@@ -45,11 +45,11 @@ const devWebpackConfig = merge(baseWebpackConfig, {
         watchOptions: {
             poll: config.dev.poll,
         },
-        before(app) {
-            app.get('/goods/list', (req, res, next) => {
-                res.json(goodsData)
-            })
-        }
+        // before(app) {
+        //     app.get('/goods/list', (req, res, next) => {
+        //         res.json(goodsData)
+        //     })
+        // }
     },
     plugins: [
         new webpack.DefinePlugin({
