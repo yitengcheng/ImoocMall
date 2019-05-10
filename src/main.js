@@ -9,12 +9,14 @@ import './assets/css/login.css';
 import './assets/css/product.css';
 import VueLazyLoad from 'vue-lazyload';
 import infiniteScroll from 'vue-infinite-scroll';
+import axios from 'axios';
 
 Vue.config.productionTip = false;
 Vue.use(VueLazyLoad, {
     loading: '/static/loading-svg/loading-balls.svg'
 });
 Vue.use(infiniteScroll);
+Vue.prototype.$http = axios;
 
 /* eslint-disable no-new */
 new Vue({
