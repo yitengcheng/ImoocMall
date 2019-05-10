@@ -1,4 +1,3 @@
-/* eslint-disable vue/require-v-for-key */
 <template>
   <div>
     <nav-header/>
@@ -27,7 +26,7 @@
                 <a
                   href="javascript:void(0)"
                   :class="{'cur': priceChecked==='all'}"
-                  @click="setPrice('all')"
+                  @click="setPriceFilter('all')"
                 >All</a>
               </dd>
               <dd v-for="(item,index) in priceFilter" :key="index" @click="setPriceFilter(index)">
@@ -53,7 +52,11 @@
                     <div class="name">{{item.productName}}</div>
                     <div class="price">{{item.salePrice}}</div>
                     <div class="btn-area">
-                      <a href="javascript:;" class="btn btn--m">加入购物车</a>
+                      <a
+                        href="javascript:;"
+                        class="btn btn--m"
+                        @click="addCart(item.productId)"
+                      >加入购物车</a>
                     </div>
                   </div>
                 </li>
@@ -63,7 +66,9 @@
                 v-infinite-scroll="loadMore"
                 infinite-scroll-disabled="busy"
                 infinite-scroll-distance="10"
-              >加载中...</div>
+              >
+                <img v-show="!busy" src="./../assets/loading/loading-spinning-bubbles.svg">
+              </div>
             </div>
           </div>
         </div>
@@ -109,9 +114,10 @@ export default {
         getGoodsList (pushFalg) {
             let params = {
                 page: this.page,
-                sort: this.sortFalg ? 1 : -1
+                sort: this.sortFalg ? 1 : -1,
+                priceLevel: this.priceChecked
             };
-            axios.get('/goods', { params }).then(result => {
+            axios.post('/goods', params).then(result => {
                 let { data } = result;
                 let { list, success, msg, count } = data;
                 if (success) {
@@ -127,12 +133,14 @@ export default {
                         this.busy = false;
                     }
                 } else {
-                    console.log(`error: ${msg}`);
+                    alert(`error: ${msg}`);
                 }
             });
         },
         setPriceFilter (index) {
             this.priceChecked = index;
+            this.page = 1;
+            this.getGoodsList();
             this.closePop();
         },
         showFilterPop () {
@@ -154,6 +162,16 @@ export default {
                 this.page++;
                 this.getGoodsList(true);
             }, 1000);
+        },
+        addCart (productId) {
+            axios.post('/goods/addCart', { productId }).then(res => {
+                let { data } = res;
+                if (data.success) {
+                    alert('加入购物车成功');
+                } else {
+                    alert(data.msg);
+                }
+            });
         }
     },
     mounted () {
