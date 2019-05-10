@@ -82,7 +82,6 @@
 import NavHeader from './../components/NavHeader';
 import NavFooter from './../components/NavFooter';
 import NavBread from './../components/NavBread';
-import axios from 'axios';
 export default {
     components: { NavHeader, NavFooter, NavBread },
     data () {
@@ -117,25 +116,32 @@ export default {
                 sort: this.sortFalg ? 1 : -1,
                 priceLevel: this.priceChecked
             };
-            axios.post('/goods', params).then(result => {
-                let { data } = result;
-                let { list, success, msg, count } = data;
-                if (success) {
-                    if (pushFalg) {
-                        this.goodsList = this.goodsList.concat(list);
-                        if (count === 0) {
-                            this.busy = true;
+            this.$http
+                .post('/goods', params)
+                .then(result => {
+                    let { data } = result;
+                    let { list, success, msg, count } = data;
+                    if (success) {
+                        if (pushFalg) {
+                            this.goodsList = this.goodsList.concat(list);
+                            if (count === 0) {
+                                this.busy = true;
+                            } else {
+                                this.busy = false;
+                            }
                         } else {
+                            this.goodsList = list;
                             this.busy = false;
                         }
                     } else {
-                        this.goodsList = list;
-                        this.busy = false;
+                        alert(`error: ${msg}`);
                     }
-                } else {
-                    alert(`error: ${msg}`);
-                }
-            });
+                })
+                .catch(err => {
+                    if (err) {
+                        alert('请求错误');
+                    }
+                });
         },
         setPriceFilter (index) {
             this.priceChecked = index;
@@ -164,14 +170,21 @@ export default {
             }, 1000);
         },
         addCart (productId) {
-            axios.post('/goods/addCart', { productId }).then(res => {
-                let { data } = res;
-                if (data.success) {
-                    alert('加入购物车成功');
-                } else {
-                    alert(data.msg);
-                }
-            });
+            this.$http
+                .post('/goods/addCart', { productId })
+                .then(res => {
+                    let { data } = res;
+                    if (data.success) {
+                        alert('加入购物车成功');
+                    } else {
+                        alert(data.msg);
+                    }
+                })
+                .catch(err => {
+                    if (err) {
+                        alert('请求错误');
+                    }
+                });
         }
     },
     mounted () {
