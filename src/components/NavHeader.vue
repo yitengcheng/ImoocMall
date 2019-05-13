@@ -34,7 +34,7 @@
             v-show="!user"
             @click="loginModalFlag=true"
           >Login</a>
-          <a href="javascript:void(0)" class="navbar-link" v-show="user">Logout</a>
+          <a href="javascript:void(0)" @click="logOut" class="navbar-link" v-show="user">Logout</a>
           <div class="navbar-cart-container">
             <span class="navbar-cart-count"></span>
             <a class="navbar-link navbar-cart-link" href="/#/cart">
@@ -103,11 +103,21 @@ export default {
             userPwd: '',
             errorTip: false,
             loginModalFlag: false,
-            user: {}
+            user: ''
         };
     },
-    computed: {},
+    mounted () {
+        this.checkLogin();
+    },
     methods: {
+        checkLogin () {
+            this.$http.post('/users/checkLogin').then(res => {
+                let { data } = res;
+                if (data.success) {
+                    this.user = data.user;
+                }
+            });
+        },
         login () {
             if (!this.userName || !this.userPwd) {
                 return (this.errorTip = true);
@@ -127,6 +137,14 @@ export default {
                         this.errorTip = true;
                     }
                 });
+        },
+        logOut () {
+            this.$http.post('/users/logout').then(res => {
+                let { data } = res;
+                if (data.success) {
+                    this.user = '';
+                }
+            });
         }
     }
 };
