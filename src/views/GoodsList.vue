@@ -1,5 +1,12 @@
 <template>
   <div>
+    <symbol id="icon-arrow-short" viewBox="0 0 25 32">
+      <title>arrow-short</title>
+      <path
+        class="path1"
+        d="M24.487 18.922l-1.948-1.948-8.904 8.904v-25.878h-2.783v25.878l-8.904-8.904-1.948 1.948 12.243 12.243z"
+      ></path>
+    </symbol>
     <nav-header/>
     <nav-bread>
       <span slot="bread">Goods</span>
@@ -11,7 +18,7 @@
           <a href="javascript:void(0)" class="default cur">Default</a>
           <a @click="sortGoods" href="javascript:void(0)" class="price">
             Price
-            <svg class="icon icon-arrow-short">
+            <svg class="icon icon-arrow-short" :class="{'sort-up':!sortFalg}">
               <use xlink:href="#icon-arrow-short"></use>
             </svg>
           </a>
@@ -75,6 +82,24 @@
       </div>
     </div>
     <div class="md-overlay" v-show="overLayFlag" @click="closePop"></div>
+    <modal :mdshow="mdshow" v-on:close="closeModal">
+      <p slot="message">请先登录，否则无法加入购物车</p>
+      <div slot="btnGroup">
+        <a class="btn" @click="mdshow=false">关闭</a>
+      </div>
+    </modal>
+    <modal :mdshow="mdshowCart" v-on:close="closeModal">
+      <p slot="message">
+        <svg class="icon-status-ok">
+          <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-status-ok"></use>
+        </svg>
+        <span>加入购物车成功！</span>
+      </p>
+      <div slot="btnGroup">
+        <a class="btn btn--m" @click="mdshowCart=false" href="javascript:;">继续购物</a>
+        <router-link class="btn btn--m" href="javascript:;" to="/cart">查看购物车</router-link>
+      </div>
+    </modal>
     <nav-footer/>
   </div>
 </template>
@@ -82,11 +107,14 @@
 import NavHeader from './../components/NavHeader';
 import NavFooter from './../components/NavFooter';
 import NavBread from './../components/NavBread';
+import Modal from './../components/Modal';
 export default {
-    components: { NavHeader, NavFooter, NavBread },
+    components: { NavHeader, NavFooter, NavBread, Modal },
     data () {
         return {
             goodsList: [],
+            mdshow: false,
+            mdshowCart: false,
             priceFilter: [
                 {
                     startPrice: '0.00',
@@ -175,16 +203,20 @@ export default {
                 .then(res => {
                     let { data } = res;
                     if (data.success) {
-                        alert('加入购物车成功');
+                        this.mdshowCart = true;
                     } else {
-                        alert(data.msg);
+                        this.mdshow = true;
                     }
                 })
                 .catch(err => {
                     if (err) {
-                        alert('请求错误');
+                        alert(err);
                     }
                 });
+        },
+        closeModal () {
+            this.mdshow = false;
+            this.mdshowCart = false;
         }
     },
     mounted () {
@@ -197,5 +229,13 @@ export default {
   height: 100px;
   line-height: 100px;
   text-align: center;
+}
+.btn:hover {
+  background-color: #ffe5e6;
+  transition: all 0.3s ease-out;
+}
+.sort-up {
+  transform: rotate(180deg);
+  transition: all 0.3s ease-out;
 }
 </style>
