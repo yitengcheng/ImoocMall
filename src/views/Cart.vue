@@ -89,9 +89,8 @@
                 <div class="cart-tab-1">
                   <div class="cart-item-check">
                     <a
-                      href="javascipt:;"
                       class="checkbox-btn item-check-btn"
-                      :class="{'check':item.checked=='1'}"
+                      :class="{'check':item.checked==1}"
                       @click="editCart('checked',item)"
                     >
                       <svg class="icon icon-ok">
@@ -117,15 +116,15 @@
                   <div class="item-quantity">
                     <div class="select-self select-self-open">
                       <div class="select-self-area">
-                        <a class="input-sub">-</a>
+                        <a class="input-sub" @click="editCart('minu',item)">-</a>
                         <span class="select-ipt">{{item.productNum}}</span>
-                        <a class="input-add">+</a>
+                        <a class="input-add" @click="editCart('add',item)">+</a>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="cart-tab-4">
-                  <div class="item-price-total">100</div>
+                  <div class="item-price-total">{{item.productNum*item.salePrice}}</div>
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
@@ -229,9 +228,57 @@ export default {
                         this.init();
                     }
                 });
+        },
+        editCart (flag, product) {
+            if (flag === 'add') {
+                product.productNum++;
+            } else if (flag === 'minu') {
+                if (product.productNum <= 1) {
+                    return alert('购物车数量不能少于1件');
+                } else {
+                    product.productNum--;
+                }
+            } else if (flag === 'checked') {
+                product.checked = product.checked === 0 ? 1 : 0;
+            }
+            this.$http
+                .post('/users/cart/edit', {
+                    productId: product.productId,
+                    productNum: product.productNum,
+                    checked: product.checked
+                })
+                .then(res => {
+                    let { data } = res;
+                    if (!data.success) {
+                        alert(`err:${data.msg}`);
+                    }
+                });
         }
     }
 };
 </script>
 <style scoped>
+.input-sub,
+.input-add {
+  min-width: 40px;
+  height: 100%;
+  border: 0;
+  color: #605f5f;
+  text-align: center;
+  font-size: 16px;
+  overflow: hidden;
+  display: inline-block;
+  background: #f0f0f0;
+}
+.item-quantity .select-self-area {
+  background: none;
+  border: 1px solid #f0f0f0;
+}
+.item-quantity .select-self-area .select-ipt {
+  display: inline-block;
+  padding: 0 3px;
+  width: 30px;
+  min-width: 30px;
+  text-align: center;
+}
 </style>
