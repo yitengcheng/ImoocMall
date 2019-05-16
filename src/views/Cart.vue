@@ -124,7 +124,7 @@
                   </div>
                 </div>
                 <div class="cart-tab-4">
-                  <div class="item-price-total">{{item.productNum*item.salePrice}}</div>
+                  <div class="item-price-total">{{item.productNum*item.salePrice | currency('￥')}}</div>
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
@@ -147,8 +147,8 @@
           <div class="cart-foot-inner">
             <div class="cart-foot-l">
               <div class="item-all-check">
-                <a href="javascipt:;">
-                  <span class="checkbox-btn item-check-btn">
+                <a @click="toggleCheckAll">
+                  <span class="checkbox-btn item-check-btn" :class="{'check':checkAllFlage}">
                     <svg class="icon icon-ok">
                       <use xlink:href="#icon-ok"></use>
                     </svg>
@@ -160,7 +160,7 @@
             <div class="cart-foot-r">
               <div class="item-total">
                 Item total:
-                <span class="total-price">500</span>
+                <span class="total-price">{{totalPrice | currency('￥')}}</span>
               </div>
               <div class="btn-wrap">
                 <a class="btn btn--red">Checkout</a>
@@ -186,6 +186,7 @@ import NavHeader from './../components/NavHeader';
 import NavFooter from './../components/NavFooter';
 import NavBread from './../components/NavBread';
 import Modal from './../components/Modal';
+import { currency } from '../utils/currency';
 export default {
     components: { NavHeader, NavFooter, NavBread, Modal },
     data () {
@@ -197,6 +198,27 @@ export default {
     },
     mounted () {
         this.init();
+    },
+    computed: {
+        checkAllFlage () {
+            return this.checkedCount === this.cartList.length;
+        },
+        checkedCount () {
+            let count = 0;
+            this.cartList.forEach(item => {
+                parseInt(item.checked) === 1 && count++;
+            });
+            return count;
+        },
+        totalPrice () {
+            let money = 0;
+            this.cartList.forEach(item => {
+                if (parseInt(item.checked) === 1) {
+                    money += parseFloat(item.productNum) * parseFloat(item.salePrice);
+                }
+            });
+            return money;
+        }
     },
     methods: {
         init () {
@@ -247,6 +269,20 @@ export default {
                     productNum: product.productNum,
                     checked: product.checked
                 })
+                .then(res => {
+                    let { data } = res;
+                    if (!data.success) {
+                        alert(`err:${data.msg}`);
+                    }
+                });
+        },
+        toggleCheckAll () {
+            let flage = !this.checkAllFlage;
+            this.cartList.forEach(item => {
+                item.checked = flage ? 1 : 0;
+            });
+            this.$http
+                .post('/users/cart/editCheckAll', { checkAll: flage })
                 .then(res => {
                     let { data } = res;
                     if (!data.success) {
