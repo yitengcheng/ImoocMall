@@ -10,6 +10,8 @@ import './assets/css/product.css';
 import VueLazyLoad from 'vue-lazyload';
 import infiniteScroll from 'vue-infinite-scroll';
 import axios from 'axios';
+import loadsh from 'lodash';
+import { currency } from './utils/currency';
 
 Vue.config.productionTip = false;
 Vue.use(VueLazyLoad, {
@@ -17,6 +19,8 @@ Vue.use(VueLazyLoad, {
 });
 Vue.use(infiniteScroll);
 Vue.prototype.$http = axios;
+Vue.prototype._ = loadsh;
+Vue.filter('currency', currency);
 
 /* eslint-disable no-new */
 new Vue({
