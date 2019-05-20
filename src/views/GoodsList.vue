@@ -147,8 +147,7 @@ export default {
             this.$http
                 .post('/goods', params)
                 .then(result => {
-                    let { data } = result;
-                    let { list, success, msg, count } = data;
+                    let { list, success, msg, count } = result;
                     if (success) {
                         if (pushFalg) {
                             this.goodsList = this.goodsList.concat(list);
@@ -198,21 +197,14 @@ export default {
             }, 1000);
         },
         addCart (productId) {
-            this.$http
-                .post('/goods/addCart', { productId })
-                .then(res => {
-                    let { data } = res;
-                    if (data.success) {
-                        this.mdshowCart = true;
-                    } else {
-                        this.mdshow = true;
-                    }
-                })
-                .catch(err => {
-                    if (err) {
-                        alert(err);
-                    }
-                });
+            this.$http.post('/goods/addCart', { productId }).then(res => {
+                let { success } = res;
+                if (success) {
+                    this.mdshowCart = true;
+                } else {
+                    this.mdshow = true;
+                }
+            });
         },
         closeModal () {
             this.mdshow = false;

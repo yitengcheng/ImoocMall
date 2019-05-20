@@ -112,9 +112,9 @@ export default {
     methods: {
         checkLogin () {
             this.$http.post('/users/checkLogin').then(res => {
-                let { data } = res;
-                if (data.success) {
-                    this.user = data.user;
+                let { success, user } = res;
+                if (success) {
+                    this.user = user;
                 }
             });
         },
@@ -128,11 +128,11 @@ export default {
                     userPwd: this.userPwd
                 })
                 .then(res => {
-                    let { data } = res;
-                    if (data.success) {
+                    let { success, user } = res;
+                    if (success) {
                         this.errorTip = false;
                         this.loginModalFlag = false;
-                        this.user = data.user;
+                        this.user = user;
                     } else {
                         this.errorTip = true;
                     }
@@ -140,8 +140,8 @@ export default {
         },
         logOut () {
             this.$http.post('/users/logout').then(res => {
-                let { data } = res;
-                if (data.success) {
+                let { success } = res;
+                if (success) {
                     this.user = '';
                 }
             });

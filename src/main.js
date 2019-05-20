@@ -18,6 +18,18 @@ Vue.use(VueLazyLoad, {
     loading: '/static/loading-svg/loading-balls.svg'
 });
 Vue.use(infiniteScroll);
+axios.interceptors.response.use(
+    response => {
+        console.log('success', { data: response.data, status: response.status });
+        return response.data;
+    },
+    error => {
+        console.log('error');
+        console.log(error);
+        console.log(JSON.stringify(error));
+        return Promise.reject(error);
+    }
+);
 Vue.prototype.$http = axios;
 Vue.prototype._ = loadsh;
 Vue.filter('currency', currency);
