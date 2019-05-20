@@ -163,7 +163,11 @@
                 <span class="total-price">{{totalPrice | currency('￥')}}</span>
               </div>
               <div class="btn-wrap">
-                <a class="btn btn--red">Checkout</a>
+                <a
+                  class="btn btn--red"
+                  :class="{'btn--dis':checkedCount ===0}"
+                  @click="checkOut"
+                >Checkout</a>
               </div>
             </div>
           </div>
@@ -223,11 +227,11 @@ export default {
     methods: {
         init () {
             this.$http.post('/users/cartList').then(res => {
-                let { data } = res;
-                if (data.success) {
-                    this.cartList = data.cartList;
+                let { success, msg, cartList } = res;
+                if (success) {
+                    this.cartList = cartList;
                 } else {
-                    alert(`err:${data.msg}`);
+                    alert(`err:${msg}`);
                 }
             });
         },
@@ -244,8 +248,8 @@ export default {
                     productId: this.productId
                 })
                 .then(res => {
-                    let { data } = res;
-                    if (data.success) {
+                    let { success } = res;
+                    if (success) {
                         this.modalConfirm = false;
                         this.init();
                     }
@@ -270,9 +274,9 @@ export default {
                     checked: product.checked
                 })
                 .then(res => {
-                    let { data } = res;
-                    if (!data.success) {
-                        alert(`err:${data.msg}`);
+                    let { success, msg } = res;
+                    if (!success) {
+                        alert(`err:${msg}`);
                     }
                 });
         },
@@ -284,11 +288,18 @@ export default {
             this.$http
                 .post('/users/cart/editCheckAll', { checkAll: flage })
                 .then(res => {
-                    let { data } = res;
-                    if (!data.success) {
-                        alert(`err:${data.msg}`);
+                    let { success, msg } = res;
+                    if (!success) {
+                        alert(`err:${msg}`);
                     }
                 });
+        },
+        checkOut () {
+            if (this.checkedCount > 0) {
+                this.$router.push({
+                    path: '/address'
+                });
+            }
         }
     }
 };
