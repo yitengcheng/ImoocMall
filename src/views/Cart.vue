@@ -124,7 +124,7 @@
                   </div>
                 </div>
                 <div class="cart-tab-4">
-                  <div class="item-price-total">{{item.productNum*item.salePrice | currency('￥')}}</div>
+                  <div class="item-price-total">{{item.productNum*item.salePrice | currency()}}</div>
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
@@ -160,7 +160,7 @@
             <div class="cart-foot-r">
               <div class="item-total">
                 Item total:
-                <span class="total-price">{{totalPrice | currency('￥')}}</span>
+                <span class="total-price">{{totalPrice | currency()}}</span>
               </div>
               <div class="btn-wrap">
                 <a
@@ -190,7 +190,6 @@ import NavHeader from './../components/NavHeader';
 import NavFooter from './../components/NavFooter';
 import NavBread from './../components/NavBread';
 import Modal from './../components/Modal';
-import { currency } from '../utils/currency';
 export default {
     components: { NavHeader, NavFooter, NavBread, Modal },
     data () {
