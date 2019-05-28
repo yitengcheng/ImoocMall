@@ -121,7 +121,7 @@
                     <dd class="address">{{address.streetName}}</dd>
                     <dd class="tel">{{address.tel}}</dd>
                   </dl>
-                  <div class="addr-opration addr-del">
+                  <div class="addr-opration addr-del" @click="delAddressConfirm(address.addressId)">
                     <a href="javascript:;" class="addr-del-btn">
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del"></use>
@@ -191,11 +191,18 @@
             </div>
           </div>
           <div class="next-btn-wrap">
-            <a class="btn btn--m btn--red">Next</a>
+            <a class="btn btn--m btn--red" @click="orderConfirm">Next</a>
           </div>
         </div>
       </div>
     </div>
+    <Modal :mdshow="isDelete" @close="closeModal">
+      <p slot="message">您是否确认要删除地址?</p>
+      <div slot="btnGroup">
+        <a class="btn btn--m" @click="delAddress">确认</a>
+        <a class="btn btn--m" @click="closeModal">取消</a>
+      </div>
+    </Modal>
     <nav-footer/>
   </div>
 </template>
@@ -204,13 +211,16 @@
 import NavHeader from './../components/NavHeader';
 import NavFooter from './../components/NavFooter';
 import NavBread from './../components/NavBread';
+import Modal from './../components/Modal';
 export default {
-    components: { NavHeader, NavFooter, NavBread },
+    components: { NavHeader, NavFooter, NavBread, Modal },
     data () {
         return {
             limit: 3,
             checkIndex: 0,
-            addressList: []
+            addressList: [],
+            isDelete: false,
+            delAddressId: ''
         };
     },
     mounted () {
@@ -246,6 +256,34 @@ export default {
                     this.init();
                 } else {
                     alert(msg);
+                }
+            });
+        },
+        closeModal () {
+            this.isDelete = false;
+        },
+        delAddressConfirm (addressId) {
+            this.isDelete = true;
+            this.delAddressId = addressId;
+        },
+        delAddress () {
+            this.$http
+                .post('/users/address/del', { addressId: this.delAddressId })
+                .then(res => {
+                    let { success, msg } = res;
+                    if (success) {
+                        this.isDelete = false;
+                        this.init();
+                    } else {
+                        alert(msg);
+                    }
+                });
+        },
+        orderConfirm () {
+            this.$router.push({
+                name: 'OrderConfirm',
+                params: {
+                    addressId: this.addressList[this.checkIndex].addressId
                 }
             });
         }
