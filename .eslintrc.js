@@ -29,6 +29,7 @@ module.exports = {
         'no-tabs': 'off',
         'no-mixed-spaces-and-tabs': 'off',
         "no-unused-vars": 'off',
-        'indent': ['error', 4]
+        'indent': ['error', 4],
+        "eqeqeq": 1,
     }
 }
