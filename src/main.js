@@ -22,6 +22,10 @@ Vue.use(infiniteScroll);
 axios.interceptors.response.use(
     response => {
         console.log('success', { data: response.data, status: response.status });
+        if (!response.data.success && response.data.status === 100) {
+            router.replace('/');
+            store.commit('user/updateUser', '');
+        }
         return response.data;
     },
     error => {
