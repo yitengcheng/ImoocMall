@@ -108,6 +108,7 @@ import NavHeader from './../components/NavHeader';
 import NavFooter from './../components/NavFooter';
 import NavBread from './../components/NavBread';
 import Modal from './../components/Modal';
+import { mapMutations } from 'vuex';
 export default {
     components: { NavHeader, NavFooter, NavBread, Modal },
     data () {
@@ -138,6 +139,7 @@ export default {
         };
     },
     methods: {
+        ...mapMutations('user', ['updateCartCount']),
         getGoodsList (pushFalg) {
             let params = {
                 page: this.page,
@@ -201,6 +203,7 @@ export default {
                 let { success } = res;
                 if (success) {
                     this.mdshowCart = true;
+                    this.updateCartCount(1);
                 } else {
                     this.mdshow = true;
                 }

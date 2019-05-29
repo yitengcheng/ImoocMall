@@ -128,11 +128,7 @@
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
-                    <a
-                      href="javascript:;"
-                      class="item-edit-btn"
-                      @click="delCartConfirm(item.productId)"
-                    >
+                    <a href="javascript:;" class="item-edit-btn" @click="delCartConfirm(item)">
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del"></use>
                       </svg>
@@ -190,13 +186,14 @@ import NavHeader from './../components/NavHeader';
 import NavFooter from './../components/NavFooter';
 import NavBread from './../components/NavBread';
 import Modal from './../components/Modal';
+import { mapMutations } from 'vuex';
 export default {
     components: { NavHeader, NavFooter, NavBread, Modal },
     data () {
         return {
             cartList: [],
             modalConfirm: false,
-            productId: ''
+            product: {}
         };
     },
     mounted () {
@@ -224,6 +221,7 @@ export default {
         }
     },
     methods: {
+        ...mapMutations('user', ['updateCartCount']),
         init () {
             this.$http.post('/users/cartList').then(res => {
                 let { success, msg, cartList } = res;
@@ -234,9 +232,9 @@ export default {
                 }
             });
         },
-        delCartConfirm (productId) {
+        delCartConfirm (product) {
             this.modalConfirm = true;
-            this.productId = productId;
+            this.product = product;
         },
         closeModal () {
             this.modalConfirm = false;
@@ -244,12 +242,13 @@ export default {
         delCart () {
             this.$http
                 .post('/users/cart/del', {
-                    productId: this.productId
+                    productId: this.product.productId
                 })
                 .then(res => {
                     let { success } = res;
                     if (success) {
                         this.modalConfirm = false;
+                        this.updateCartCount(-this.product.productNum);
                         this.init();
                     }
                 });
@@ -276,6 +275,12 @@ export default {
                     let { success, msg } = res;
                     if (!success) {
                         alert(`err:${msg}`);
+                    } else {
+                        if (flag === 'add') {
+                            this.updateCartCount(1);
+                        } else if (flag === 'minu') {
+                            this.updateCartCount(-1);
+                        }
                     }
                 });
         },

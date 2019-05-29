@@ -11,6 +11,7 @@ import VueLazyLoad from 'vue-lazyload';
 import infiniteScroll from 'vue-infinite-scroll';
 import axios from 'axios';
 import loadsh from 'lodash';
+import store from './vuex/index';
 import { currency } from './utils/currency';
 
 Vue.config.productionTip = false;
@@ -38,6 +39,7 @@ Vue.filter('currency', currency);
 new Vue({
     el: '#app',
     router,
+    store,
     components: { App },
     template: '<App/>'
 });

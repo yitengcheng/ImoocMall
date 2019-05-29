@@ -36,7 +36,7 @@
           >Login</a>
           <a href="javascript:void(0)" @click="logOut" class="navbar-link" v-show="user">Logout</a>
           <div class="navbar-cart-container">
-            <span class="navbar-cart-count"></span>
+            <span class="navbar-cart-count" v-if="count>0">{{count}}</span>
             <a class="navbar-link navbar-cart-link" href="/#/cart">
               <svg class="navbar-cart-logo">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-cart"></use>
@@ -95,6 +95,7 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex';
 export default {
     components: {},
     data () {
@@ -102,19 +103,30 @@ export default {
             userName: '',
             userPwd: '',
             errorTip: false,
-            loginModalFlag: false,
-            user: ''
+            loginModalFlag: false
         };
     },
     mounted () {
         this.checkLogin();
     },
+    computed: {
+        ...mapState({
+            user: state => state.user.user,
+            count: state => state.user.cartCount
+        })
+    },
     methods: {
+        ...mapMutations('user', [
+            'updateUser',
+            'updateCartCount',
+            'emptyCartCount'
+        ]),
         checkLogin () {
             this.$http.post('/users/checkLogin').then(res => {
                 let { success, user } = res;
                 if (success) {
-                    this.user = user;
+                    this.updateUser(user);
+                    this.count === 0 && this.getCartListCount();
                 }
             });
         },
@@ -132,7 +144,8 @@ export default {
                     if (success) {
                         this.errorTip = false;
                         this.loginModalFlag = false;
-                        this.user = user;
+                        this.updateUser(user);
+                        this.getCartListCount();
                     } else {
                         this.errorTip = true;
                     }
@@ -142,7 +155,18 @@ export default {
             this.$http.post('/users/logout').then(res => {
                 let { success } = res;
                 if (success) {
-                    this.user = '';
+                    this.updateUser('');
+                    this.emptyCartCount();
+                }
+            });
+        },
+        getCartListCount () {
+            this.$http.post('/users/getCartListCount').then(res => {
+                let { success, msg, count } = res;
+                if (success) {
+                    this.updateCartCount(count);
+                } else {
+                    alert(msg);
                 }
             });
         }
